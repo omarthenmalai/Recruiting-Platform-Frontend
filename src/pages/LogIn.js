@@ -1,13 +1,10 @@
 import React from 'react';
-import { Form, Button } from "react-bootstrap";
-import {email, required} from '../util/validation';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/styles';
-import { Redirect } from 'react-router-dom';
-import axios from 'axios';
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
-import Box from "@material-ui/core/Box";
+import Button from "@material-ui/core/Button";
+import Typography from "@material-ui/core/Typography";
 
 const url = "http://localhost:8080";
 
@@ -15,11 +12,6 @@ const styles = (theme) => ({
     root: {
         flexGrow: 1,
         margin: theme.spacing(1)
-    },
-    paper: {
-        padding: theme.spacing(2),
-        textAlign: 'center',
-        color: theme.palette.text.secondary,
     },
 });
 
@@ -30,28 +22,17 @@ class LogIn extends React.Component {
         this.state = {
             sent: false,
             redirect: false,
-            email: "",
+            username: "",
             password: "",
             validUser: "",
             response: "",
+            error: " ",
         };
         this.handleSubmit = this.handleSubmit.bind(this);
 
     }
 
 
-
-    validate = values => {
-        const errors = required(['email', 'password'], values, this.props);
-
-        if (!errors.email) {
-            const emailError = email(values.email, values, this.props);
-            if (emailError) {
-                errors.email = email(values.email, values, this.props);
-            }
-        }
-        return errors;
-    };
 
     handleChange = (e) => {
         this.setState({
@@ -63,8 +44,8 @@ class LogIn extends React.Component {
         // e.preventDefault();
         var self = this;
         let formData = new FormData();
-        console.log(this.state.email);
-        formData.append('username', self.state.email,);
+        console.log(this.state.username);
+        formData.append('username', self.state.username,);
         formData.append('password', self.state.password,);
         console.log(this.state);
         fetch(url+'/login', {
@@ -81,11 +62,14 @@ class LogIn extends React.Component {
             })
             .then(response => {
                 console.log(response.json())
-                if(response.status==200)
-                    this.props.history.push('/profile')
+                if(response.status==200) {
+                    window.location.href = "http://localhost:3000/profile";
+                }
+
             })
             .catch(error => {
-                console.log(error)
+                console.log(error);
+                self.setState({error: "Invalid Username and Password"});
             });
         })
         .catch(error => {
@@ -111,49 +95,54 @@ class LogIn extends React.Component {
             </div>
         )
 
-        // if (this.state.redirect)
-        //     this.props.history.push('/profile');
-        //     // return <Redirect push to="/profile"/>;
         return(
-            <div className={classes.root}>
-                <Box
-                    display="flex"
-                    justifyContent="center"
-                    alignItems="center"
-                    minHeight="50vh"
-                >
-                    <Grid container spacing={3} xs={6} justify={"center"} direction={"column"}>
-                        <Grid item>
-                            {text}
-                        </Grid>
-                        <Grid item>
-                            <TextField
-                                id="standard-basic"
-                                label="Email"
-                                name={'email'}
-                                onChange={this.handleChange}
-                                className={classes.paper}
-                            />
-                        </Grid>
-                        <Grid item>
-                            <TextField
-                                id="standard-basic"
-                                label="Password"
-                                name={'password'}
-                                // type={'password'}
-                                onChange={this.handleChange}
-                                className={classes.paper}
-                            />
-                        </Grid>
-                        <Grid item>
-                            <Button variant="outlined" className={classes.paper} color="primary" type={'submit'} onClick={this.handleSubmit} disableElevation={true}>
-                                Sign In
-                            </Button>
-                        </Grid>
+            <Grid className={classes.root}container spacing={2} direction={"column"} alignContent={"center"} justify={"center"}>
+                <Grid item spacing={0}>
+                    <h1 align={'center'}>
+                        Login
+                    </h1>
+                </Grid>
+                <Grid item xs={4}>
+                    <TextField
+                        id="standard-basic"
+                        label="Username"
+                        name={'username'}
+                        onChange={this.handleChange}
+                        value={this.state.username}
+                        variant={'outlined'}
+                        className={classes.textfield}
+                        required={true}
+                    />
+                </Grid>
+                <Grid item xs={4}>
+                    <TextField
+                        id="standard-basic"
+                        label="Password"
+                        onChange={this.handleChange}
+                        name={'password'}
+                        variant={"outlined"}
+                        value={this.state.password}
+                        className={classes.textfield}
+                        required={true}
+                    />
+                </Grid>
+                <Grid item xs={4}>
+                    {this.state.error}
+                </Grid>
 
-                    </Grid>
-                </Box>
-            </div>
+                <Grid item xs={4}>
+                    <Button className={classes.button} variant="contained" color="primary" type={'submit'} onClick={this.handleSubmit}>
+                        Sign In
+                    </Button>
+                </Grid>
+                <Grid item xs={4}>
+                    <Typography variant={"h6"}>
+                        Dont have an account? <a href={"http://localhost:3000/register"}>Sign Up</a>
+                    </Typography>
+
+                </Grid>
+            </Grid>
+
         );
     };
 }

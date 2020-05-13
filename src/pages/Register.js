@@ -1,23 +1,18 @@
 import React from 'react';
-import { Form, Button } from "react-bootstrap";
-import {email, required} from '../util/validation';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/styles';
-import { Redirect } from 'react-router-dom';
-import axios from 'axios';
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
-import Box from "@material-ui/core/Box";
 import InputLabel from "@material-ui/core/InputLabel";
 import {Select} from "@material-ui/core";
 import MenuItem from "@material-ui/core/MenuItem";
+import Button from "@material-ui/core/Button";
 
 const url = "http://localhost:8080";
 
 const styles = (theme) => ({
     root: {
-        minWidth: 275,
-        marginTop: 50,
+        margin: theme.spacing(1),
         flexGrow: 1,
     },
     textfield: {
@@ -54,6 +49,7 @@ class Register extends React.Component {
             accountType: null,
             validUser: "",
             response: "",
+            error: "",
         };
         this.handleSubmit = this.handleSubmit.bind(this);
 
@@ -61,26 +57,49 @@ class Register extends React.Component {
 
 
 
-    validate = values => {
-        const errors = required(['email', 'password'], values, this.props);
-
-        if (!errors.email) {
-            const emailError = email(values.email, values, this.props);
-            if (emailError) {
-                errors.email = email(values.email, values, this.props);
-            }
-        }
-        return errors;
-    };
-
     handleChange = (e) => {
         this.setState({
             [e.target.name]: e.target.value
         });
     };
 
+    isInvalidEmail(email) {
+        let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+        if(re.test(email))
+            return false;
+        else
+            return true;
+
+
+    }
+
+    validate = () => {
+        var error = false;
+        if(this.state.username == null || this.state.username.length < 6 || this.state.username.length > 32) {
+            error = true
+            this.setState({error: "Username must be between 6 and 32 characters long"})
+        } else if(this.state.email == null || this.isInvalidEmail(this.state.email)) {
+            error = true;
+            this.setState({error: "Invalid email"})
+        } else if(this.state.accountType == null) {
+            error = true;
+            this.setState({error: "Select an Account Type"})
+        } else if(this.state.password.length < 8) {
+            error = true;
+            this.setState({error: "Password must be at least 8 characters long"})
+        } else if(this.state.password != this.state.passwordConfirm) {
+            error = true;
+            this.setState({error: "Passwords don't match"})
+        }
+        return error;
+    }
+
     async handleSubmit(e) {
         var self = this;
+        var err = this.validate();
+        if(err)
+            return;
         let formData = new FormData();
         formData.append('email', self.state.email,);
         formData.append('password', self.state.password,);
@@ -202,6 +221,12 @@ class Register extends React.Component {
                         <Button className={classes.button} variant="contained" color="primary" type={'submit'} onClick={this.handleSubmit}>
                             Register
                         </Button>
+                    </Grid>
+                    <Grid item xs={4}>
+                        {this.state.error}
+                    </Grid>
+                    <Grid item xs={4}>
+
                     </Grid>
                 </Grid>
         );

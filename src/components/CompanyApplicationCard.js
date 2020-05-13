@@ -12,6 +12,7 @@ import axios from "axios";
 import PropTypes from "prop-types";
 import Modal from "@material-ui/core/Modal";
 import CompanyProfile from "./CompanyProfile";
+import Application from "./Application";
 
 const url = "http://localhost:8080";
 
@@ -37,13 +38,14 @@ class CompanyApplicationCard extends React.Component {
         super(props);
         this.state = {
             user: this.props.user,
-            app: null,
+            apps: null,
             job: this.props.job,
+            showApps: false,
         };
 
     };
 
-    getApplication = () => {
+    getApplications = () => {
         var self = this;
         // console.log(url + '/api/applications?jobid=' + this.props.job.id);
         fetch(url + '/api/applications?jobid=' + this.props.job.id, {
@@ -59,7 +61,7 @@ class CompanyApplicationCard extends React.Component {
             })
             .then(json => {
                 console.log(json)
-                self.setState({app: json})
+                self.setState({apps: json})
             })
             .catch(error => {
                 console.log(error);
@@ -67,7 +69,7 @@ class CompanyApplicationCard extends React.Component {
     }
 
     async componentDidMount() {
-        await this.getApplication();
+        await this.getApplications();
     }
 
     viewApplication = () => {
@@ -87,45 +89,69 @@ class CompanyApplicationCard extends React.Component {
     render(){
         const { classes, job, user } = this.props;
         console.log(job);
+        let apps;
+        if(this.state.apps == null) {
+            apps = (
+                <div>
+                    Loading...
+                </div>
+            )
+        } else if (this.state.apps.length == 0 && this.state.showApps) {
+            apps = (
+                <div>
+                    No Applications
+                </div>
+            )
+        } else if(this.state.showApps) {
+            apps = this.state.apps.map(app => <Application app={app}/>);
+        } else {
+            apps = (<div></div>);
+        }
+
+        let buttontext = (!this.state.showApps)  ? (
+            <Button
+                size="small"
+                variant={'outlined'}
+                color={'primary'}
+                onClick={() => {this.setState({showApps:true});}}
+            >
+                View Applications
+            </Button>
+        ) : (
+            <Button
+                size="small"
+                variant={'outlined'}
+                color={'primary'}
+                onClick={() => {this.setState({showApps:false});}}
+            >
+                Hide Applications
+            </Button>
+        )
+
+
         let card;
-        if(this.state.app == null) {
+        if(this.state.apps == null) {
             card = (<div>Loading...</div>)
         } else {
             card = (
                 <div>
                     <Card className={classes.mycard} variant={"outlined"}>
-                        <Grid container direction={"row"} spacing={0} justify={"left"}>
-                            <Grid xs={4}>
-                                <CardContent>
-                                    <Typography className="jobTitle" variant="h5" component="h2" color="textPrimary"
-                                                gutterBottom>
-                                        {this.state.job.title}
-                                    </Typography>
-                                    <Typography className={classes.pos} color="textSecondary">
-                                        {this.state.job.location}
-                                    </Typography>
-                                    <Typography variant="body2" component="p">
-                                        {this.state.job.experienceLevel} Years Experience Required
-                                    </Typography>
-                                    <Typography variant="body2" component="p">
-                                        {this.state.job.salary}
-                                    </Typography>
-                                </CardContent>
-                                <CardActions>
-                                    <Button size="small" variant={'outlined'} color={'primary'}
-                                            onClick={this.viewApplication}>
-                                        View Application
-                                    </Button>
-                                </CardActions>
-                            </Grid>
-                            <Divider orientation={"vertical"} flexItem/>
-                            <Grid item xs={3} justify={'center'}>
-                                <Typography variant="body2" component="p">
-                                    Status: {this.state.app.applicationStatus}
-                                </Typography>
-                            </Grid>
-                        </Grid>
+                        <CardContent>
+                            <Typography className="jobTitle" variant="h5" component="h2" color="textPrimary"
+                                        gutterBottom>
+                                {this.state.job.title}
+                            </Typography>
+                            <Typography className={classes.pos} color="textSecondary">
+                                {this.state.job.location}
+                            </Typography>
+                        </CardContent>
+                        <CardActions>
+                            {buttontext}
+                        </CardActions>
                     </Card>
+                    <div>
+                        {apps}
+                    </div>
                 </div>
             )
         }

@@ -1,22 +1,12 @@
 import React from 'react';
 import {Select, withStyles} from "@material-ui/core";
 import PropTypes from 'prop-types';
-import { Card } from '@material-ui/core';
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
 import Button from "@material-ui/core/Button";
-import Typography from "@material-ui/core/Typography";
-import JobCard from "../components/JobCard";
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
-import FormControl from "@material-ui/core/FormControl";
 import MenuItem from "@material-ui/core/MenuItem";
-import Form from "react-bootstrap/Form";
-import Slider from "@material-ui/core/Slider";
 import InputLabel from "@material-ui/core/InputLabel";
-import JobSearchForm from "../components/JobSearchForm";
-import qs from "query-string";
-import axios from "axios";
+import ApplicantJobCard from "../components/ApplicantJobCard";
 
 const url = "http://localhost:8080"
 
@@ -38,9 +28,6 @@ const styles = (theme) => ({
     pos: {
         marginBottom: 12,
     },
-    jobs: {
-
-    },
     button: {
         minWidth: 235,
     }
@@ -56,7 +43,9 @@ class SearchJobs extends React.Component {
             title: null,
             location: null,
             experienceLevel: null,
-            salary: null,
+            minsalary: null,
+            validUser: false,
+            user: null,
 
         };
 
@@ -68,15 +57,17 @@ class SearchJobs extends React.Component {
         var first = true;
         var params = {
             title: this.state.title,
-            salary: this.state.salary,
+            minsalary: this.state.minsalary,
             location: this.state.location,
             experienceLevel: this.state.experienceLevel,
         }
         var endpoint = "http://localhost:8080/api/jobs?";
         for(const key in params) {
-            if(params[key] != null){
-                if(first)
+            if(params[key] != null && params[key] != ""){
+                if(first) {
                     endpoint = endpoint + key + "=" + params[key];
+                    first = false;
+                }
                 else
                     endpoint = endpoint + "&" + key + "=" + params[key];
             }
@@ -101,44 +92,55 @@ class SearchJobs extends React.Component {
         });
     };
 
-    salaryText(value) {
-        const salary = value*2.5;
-        return '${salary}+';
-    }
     handleChange = (e) => {
         this.setState({
-            [e.target.name]: e.target.value
-        });
+            [e.target.name]: e.target.value,
+            data: null,
+        })
     };
 
+    async componentDidMount() {
+        await this.getProfile();
+    }
 
+    getProfile = () => {
+        const self = this;
+        fetch(url + "/api/currentuser", {
+            credentials: 'include',
+            method: 'GET',
+            mode: 'cors',
+        })
+        .then(response => {
+            console.log(response);
+            this.state.validUser = (response.status === 200);
+            if(response.status === 200) {
+                return response.json();
+            }
+            else
+                return response;
+        })
+        .then(myJson => {
+            if(this.state.validUser) {
+                console.log(myJson);
+                this.setState({ loading: false, user : myJson});
+            }
+        })
+        .catch(error => {
+            console.error('Error: ', error);
+            window.location.href = "http://localhost:3000/login";
+
+        });
+
+    }
 
     render() {
         const { classes } = this.props;
         let jobs = !this.state.loading ? ((this.state.data && this.state.data.length) ? (
-            this.state.data.map(job => <JobCard classes={classes} info={job} type={'applicant'}/>)
+            this.state.data.map(job => <ApplicantJobCard classes={classes} info={job} user={this.state.user}/>)
         ) : <h2>No Matches Found That Meet Your Criteria</h2>) : (
             <p>Loading...</p>
         );
 
-        const salaries = [
-            {
-                value: 0,
-                label: '0+',
-            },
-            {
-                value: 20,
-                label: '50,000+',
-            },
-            {
-                value: 50,
-                label: '125,000+',
-            },
-            {
-                value: 100,
-                label: '250,000+',
-            },
-        ];
 
         return (
             <Grid container>
@@ -155,7 +157,7 @@ class SearchJobs extends React.Component {
                                 label="Position"
                                 name={'title'}
                                 onChange={this.handleChange}
-                                defaultValue={this.state.title}
+                                value={this.state.title}
                                 variant={'outlined'}
                                 className={classes.textfield}
                             />
@@ -166,6 +168,7 @@ class SearchJobs extends React.Component {
                                 label="Location"
                                 onChange={this.handleChange}
                                 name={'location'}
+                                value={this.state.location}
                                 variant={"outlined"}
                                 className={classes.textfield}
                             />
@@ -177,8 +180,8 @@ class SearchJobs extends React.Component {
                             <Select
                                 labelId="exp-label"
                                 id="exp-select"
-                                value={this.state.salary}
-                                name="salary"
+                                value={this.state.minsalary}
+                                name="minsalary"
                                 displayEmpty
                                 className={classes.dropdown}
                                 inputProps={{ 'aria-label': 'experienceLevel' }}

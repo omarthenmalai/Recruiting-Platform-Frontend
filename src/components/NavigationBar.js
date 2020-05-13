@@ -1,28 +1,23 @@
 import React, {Component, Fragment} from "react";
-import { Link } from "react-router-dom";
 import PropTypes from 'prop-types'
-import {BrowserRouter as Router, Route, Switch} from 'react-router-dom';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Button from '@material-ui/core/Button';
 import Typography from "@material-ui/core/Typography";
-import IconButton from "@material-ui/core/IconButton";
 import {withStyles} from "@material-ui/core";
-import Grid from "@material-ui/core/Grid";
-import history from '../util/history'
-import {NavItem} from "react-bootstrap";
 
-const url = "http://localhost:8080/"
+const url = "http://localhost:3000"
+const api = "http://localhost:8080"
 
 const styles = (theme) => ({
     root: {
         flexGrow: 1,
     },
-    menuButton: {
-        marginRight: theme.spacing(2),
-    },
     title: {
         flexGrow: 1,
+    },
+    feature: {
+        marginLeft: theme.spacing(2),
     },
 });
 
@@ -33,13 +28,14 @@ class NavigationBar extends Component {
         this.state = {
             user: null,
             validUser: false,
+            loading: true,
         }
     }
 
     getProfile = () => {
         const self = this;
         let status;
-        fetch(url + "api/currentuser", {
+        fetch( api + "/api/currentuser", {
             credentials: 'include',
             method: 'GET',
             mode: 'cors',
@@ -72,37 +68,82 @@ class NavigationBar extends Component {
         await this.getProfile()
     }
 
+    handleLogout() {
+        fetch(api + '/logout', {
+            method: 'POST',
+            mode: 'no-cors',
+            credentials: "include",
+        })
+        .then(response => {
+            console.log(response)
+        })
+        .catch(error => {
+            console.log(error)
+        });
+        window.location.href = url + '/login'
+
+    }
 
 
     render() {
         const { classes } = this.props;
         // console.log(this.state);
         let login = (!this.state.validUser) ? (
-
-                <div>
-                    login
-                </div>
+            <Fragment>
+                <Button className={classes.button} href={url + '/login'}>
+                    Login
+                </Button>
+                <Button className={classes.button} href={url + '/register'}>
+                    Register
+                </Button>
+            </Fragment>
 
         ) : (
             <Fragment>
-                    <Button>
+                    <Button className={classes.button} href={url + '/profile'}>
                         Profile
+                    </Button>
+                    <Button className={classes.button} onClick={this.handleLogout}>
+                        Sign Out
                     </Button>
 
             </Fragment>
         )
+
+        let features;
+        if(this.state.user == null) {
+            features = <div></div>
+        } else {
+            features = (this.state.user != null && this.state.user.accountType == "Company") ? (
+                <div>
+                    <Button href={url + "/post-job"}>
+                        Post a Job
+                    </Button>
+                </div>
+            ) : (
+                <Button href={url + "/jobs"}>
+                    Search Jobs
+                </Button>
+            )
+        }
+
         return(
-            <AppBar position="static">
-                <Toolbar>
-                    <Button>Search Jobs</Button>
-                    <Button>Post A Job</Button>
-                    <Typography variant="h6" className={classes.title}>
-                        Recruiter
-                    </Typography>
-                        {/*<Button color="inherit">Login</Button>*/}
-                        {login}
-                </Toolbar>
-            </AppBar>
+            <div className={classes.root}>
+                <AppBar position="static">
+                    <Toolbar>
+
+                        <Typography variant="h6">
+                            Recruiter
+                        </Typography>
+                        <div className={classes.feature}>
+                            {features}
+                        </div>
+                        <div>
+                            {login}
+                        </div>
+                    </Toolbar>
+                </AppBar>
+            </div>
         )
     }
 }

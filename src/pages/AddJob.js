@@ -43,9 +43,9 @@ class AddJob extends React.Component {
             response: '',
             title: null,
             location: null,
-            experienceLevel: 0,
+            experienceLevel: null,
             description: null,
-            salary: 0,
+            salary: null,
             validUser: false,
             user: null,
 
@@ -58,30 +58,54 @@ class AddJob extends React.Component {
         });
     };
 
+    validate = () => {
+        var error = false;
+        if(this.state.title === null || this.state.title === "") {
+            error = true;
+            this.setState({response: "Position is required"})
+        } else if(this.state.location === null || this.state.location === "") {
+            error = true
+            this.setState({response: "Location is required"})
+        }else if(this.state.experienceLevel === null) {
+            error = true
+            this.setState({response: "Experience Level is required"})
+        } else if(this.state.salary === null) {
+            error = true
+            this.setState({response: "Salary is required"})
+
+        }
+        return error;
+    }
+
     handleSubmit = () => {
-        var that = this;
-        const endpoint = url + '/api/jobs?title='
-            + this.state.title
-            + '&location=' + this.state.location
-            + '&experienceLevel=' + this.state.experienceLevel
-            + '&salary=' + this.state.salary
-            + '&description=' + this.state.description
-        console.log(endpoint);
-        fetch(endpoint, {
-            credentials: 'include',
-            method: 'POST',
-            mode: 'cors',
-        })
-        .then(function(response) {
-            return response.text();
-        })
-        .then(function(data) {
-            console.log(data)
-            that.setState({ response: data});
-        })
-        .catch(error => {
-            console.log(error);
-        });
+        var err = this.validate();
+        if(err) {
+            return;
+        } else {
+            var that = this;
+            const endpoint = url + '/api/jobs?title='
+                + this.state.title
+                + '&location=' + this.state.location
+                + '&experienceLevel=' + this.state.experienceLevel
+                + '&salary=' + this.state.salary
+                + '&description=' + this.state.description
+            console.log(endpoint);
+            fetch(endpoint, {
+                credentials: 'include',
+                method: 'POST',
+                mode: 'cors',
+            })
+            .then(function (response) {
+                return response.text();
+            })
+            .then(function (data) {
+                console.log(data)
+                that.setState({response: data});
+            })
+            .catch(error => {
+                console.log(error);
+            });
+        }
     };
 
     getProfile = () => {

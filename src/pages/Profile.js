@@ -1,9 +1,5 @@
 import React from 'react'
-import axios from "axios"
-import JobCard from "../components/JobCard";
-import ApplicantApplicationCard from "../components/ApplicantApplicationCard";
 import Grid from "@material-ui/core/Grid";
-import UserInfo from "../components/UserInfo";
 import withStyles from "@material-ui/core/styles/withStyles";
 import CompanyProfile from "../components/CompanyProfile";
 import ApplicantProfile from "../components/ApplicantProfile";
@@ -75,6 +71,7 @@ class Profile extends React.Component {
         })
         .catch(error => {
             console.error('Error: ', error);
+            window.location.href = "http://localhost:3000/login";
         });
 
     }

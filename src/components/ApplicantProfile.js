@@ -4,7 +4,7 @@ import UserInfo from "./UserInfo";
 import ApplicantApplicationCard from "./ApplicantApplicationCard";
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
-import JobCard from "./JobCard";
+import JobCard from "./CompanyJobCard";
 import CompanyProfile from "./CompanyProfile";
 
 

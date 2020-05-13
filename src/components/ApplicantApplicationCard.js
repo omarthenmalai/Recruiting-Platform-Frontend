@@ -19,11 +19,6 @@ const styles = (theme) => ({
     root: {
         minWidth: 275,
     },
-    bullet: {
-        display: 'inline-block',
-        margin: '0 2px',
-        transform: 'scale(0.8)',
-    },
     title: {
         fontSize: 14,
     },
@@ -87,7 +82,11 @@ class ApplicantApplicationCard extends React.Component {
 
     render(){
         const { classes, app, user } = this.props;
-        console.log(app);
+        const formatter = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 2
+        })
         let card;
         if(this.state.job == null) {
             card = (<div>Loading...</div>)
@@ -96,37 +95,30 @@ class ApplicantApplicationCard extends React.Component {
             card = (
                 <div>
                     <Card className={classes.mycard} variant={"outlined"}>
-                        <Grid container direction={"row"} spacing={0} justify={"left"}>
-                            <Grid xs={4}>
-                                <CardContent>
-                                    <Typography className="jobTitle" variant="h5" component="h2" color="textPrimary"
-                                                gutterBottom>
-                                        {this.state.job.title}
-                                    </Typography>
-                                    <Typography className={classes.pos} color="textSecondary">
-                                        {this.state.job.location}
-                                    </Typography>
-                                    <Typography variant="body2" component="p">
-                                        {this.state.job.experienceLevel} Years Experience Required
-                                    </Typography>
-                                    <Typography variant="body2" component="p">
-                                        {this.state.job.salary}
-                                    </Typography>
-                                </CardContent>
-                                <CardActions>
-                                    <Button size="small" variant={'outlined'} color={'primary'}
-                                            onClick={this.deleteApplication}>
-                                        Delete
-                                    </Button>
-                                </CardActions>
-                            </Grid>
-                            <Divider orientation={"vertical"} flexItem/>
-                            <Grid item xs={3} justify={'center'}>
-                                <Typography variant="body2" component="p">
-                                    Status: {this.state.app.applicationStatus}
-                                </Typography>
-                            </Grid>
-                        </Grid>
+                        <CardContent>
+                            <Typography className="jobTitle" variant="h5" component="h2" color="textPrimary"
+                                        gutterBottom>
+                                {this.state.job.title}
+                            </Typography>
+                            <Typography className={classes.pos} color="textSecondary">
+                                {this.state.job.location}
+                            </Typography>
+                            <Typography variant="body2" component="p">
+                                {this.state.job.experienceLevel} Years Experience Required
+                            </Typography>
+                            <Typography variant="body2" component="p">
+                                {formatter.format(this.state.job.salary)}
+                            </Typography>
+                            <Typography variant="body2" component="p">
+                                Status: {this.state.app.applicationStatus}
+                            </Typography>
+                        </CardContent>
+                        <CardActions>
+                            <Button size="small" variant={'outlined'} color={'primary'}
+                                    onClick={this.deleteApplication}>
+                                Delete
+                            </Button>
+                        </CardActions>
                     </Card>
                 </div>
             )

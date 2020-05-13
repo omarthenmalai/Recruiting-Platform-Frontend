@@ -11,7 +11,6 @@ import createMuiTheme from "@material-ui/core/styles/createMuiTheme";
 import Jobs from "./pages/SearchJobs";
 import Profile from "./pages/Profile"
 import AddJob from "./pages/AddJob";
-import history from './util/history';
 import Register from "./pages/Register";
 
 
@@ -24,11 +23,11 @@ class App extends React.Component {
               <div className="App">
                       <NavigationBar/>
                           <div className="container">
-                              <Router history={history}>
+                              <Router>
                                   <Switch>
                                       <Route path="/" exact component={Welcome}/>
                                       <Route path='/login' exact component={LogIn}/>
-                                      <Route path='/jobs' exact component={Jobs}/>
+                                      <Route path='/jobs' exact component={SearchJobs}/>
                                       <Route path={'/profile'} exact component={Profile}/>
                                       <Route path={'/post-job'} exact component={AddJob}/>
                                       <Route path={'/register'} exact component={Register}/>
