@@ -32,67 +32,65 @@ const styles = (theme) => ({
     },
 });
 
-class ApplicantApplicationCard extends React.Component {
+class CompanyApplicationCard extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             user: this.props.user,
-            app: this.props.app,
-            job: null,
-            show: true,
+            app: null,
+            job: this.props.job,
         };
 
     };
 
-    getJob = () => {
+    getApplication = () => {
         var self = this;
-        console.log(url + '/api/jobs/' + this.props.app.jobId);
-        fetch(url + '/api/jobs/' + this.props.app.jobId, {
+        // console.log(url + '/api/applications?jobid=' + this.props.job.id);
+        fetch(url + '/api/applications?jobid=' + this.props.job.id, {
             method: "GET",
             mode: "cors",
             credentials: "include",
         })
-        .then(response => {
-            if(response.status == 200) {
-                return response.json();
-            }
-            return response;
-        })
-        .then(json => {
-            self.setState({job: json})
-        })
-        .catch(error => {
-            console.log(error);
-        })
+            .then(response => {
+                if(response.status == 200) {
+                    return response.json();
+                }
+                return response;
+            })
+            .then(json => {
+                console.log(json)
+                self.setState({app: json})
+            })
+            .catch(error => {
+                console.log(error);
+            })
     }
 
     async componentDidMount() {
-        await this.getJob();
+        await this.getApplication();
     }
 
-    deleteApplication = () => {
+    viewApplication = () => {
         var self = this;
-        console.log(url + '/api/applications/delete?id=' + this.props.app.id);
-        fetch(url + '/api/applications/delete?id=' + this.props.app.id, {
-            method: "POST",
+        console.log(url + '/api/file?id=' + this.props.app.id);
+        fetch(url + '/api/file?id=' + this.props.app.id, {
+            method: "GET",
             mode: "cors",
             credentials: "include",
         })
-        .catch(error => {
-            console.log(error);
-        })
-        this.setState({show: false})
+            .catch(error => {
+                console.log(error);
+            })
     }
 
 
     render(){
-        const { classes, app, user } = this.props;
-        console.log(app);
+        const { classes, job, user } = this.props;
+        console.log(job);
         let card;
-        if(this.state.job == null) {
+        if(this.state.app == null) {
             card = (<div>Loading...</div>)
-        }
-        else if(this.state.show) {
+        } else {
             card = (
                 <div>
                     <Card className={classes.mycard} variant={"outlined"}>
@@ -115,8 +113,8 @@ class ApplicantApplicationCard extends React.Component {
                                 </CardContent>
                                 <CardActions>
                                     <Button size="small" variant={'outlined'} color={'primary'}
-                                            onClick={this.deleteApplication}>
-                                        Delete
+                                            onClick={this.viewApplication}>
+                                        View Application
                                     </Button>
                                 </CardActions>
                             </Grid>
@@ -130,11 +128,7 @@ class ApplicantApplicationCard extends React.Component {
                     </Card>
                 </div>
             )
-        } else {
-            card = <div></div>
         }
-
-
 
 
         return (
@@ -146,12 +140,12 @@ class ApplicantApplicationCard extends React.Component {
     }
 }
 
-ApplicantApplicationCard.propTypes = {
-    app: PropTypes.object.isRequired,
+CompanyApplicationCard.propTypes = {
+    job: PropTypes.object.isRequired,
     user: PropTypes.object.isRequired,
     classes: PropTypes.object.isRequired,
 
 };
 
 
-export default withStyles(styles)(ApplicantApplicationCard)
+export default withStyles(styles)(CompanyApplicationCard)

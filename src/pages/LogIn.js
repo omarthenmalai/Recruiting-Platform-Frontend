@@ -23,17 +23,6 @@ const styles = (theme) => ({
     },
 });
 
-const fakeAuth = {
-    isAuthenticated: false,
-    authenticate(cb) {
-        this.isAuthenticated = true;
-        setTimeout(cb, 100); // fake async
-    },
-    signout(cb) {
-        this.isAuthenticated = false;
-        setTimeout(cb, 100);
-    }
-};
 
 class LogIn extends React.Component {
     constructor(props) {
@@ -73,27 +62,39 @@ class LogIn extends React.Component {
     async handleSubmit(e) {
         // e.preventDefault();
         var self = this;
+        let formData = new FormData();
+        console.log(this.state.email);
+        formData.append('username', self.state.email,);
+        formData.append('password', self.state.password,);
         console.log(this.state);
-        // axios.post(url + '/login/users', {
-        //     email: this.state.email,
-        //     password: this.state.password,
-        // })
-        const endpoint = url + '/users/login?email=' + this.state.email + "&password=" + this.state.password;
-        await axios.post(endpoint)
-        .then(response => {
-            console.log(response);
-            self.setState({ validUser: (response.status === 200), sent: true, response: response.data});
-            if(response.status === 200) {
-                self.setState({redirect: true});
-                console.log(this.state);
-                // localStorage.setItem('authToken', this.state.email);
-                this.props.history.push('/profile');
-            }
+        fetch(url+'/login', {
+            method: 'POST',
+            mode: 'no-cors',
+            credentials: 'include',
+            body: formData,
+        })
+        .then(opaqueRes => {
+            fetch(url+'/api/currentuser', {
+                method: "GET",
+                mode: "cors",
+                credentials: "include",
+            })
+            .then(response => {
+                console.log(response.json())
+                if(response.status==200)
+                    this.props.history.push('/profile')
+            })
+            .catch(error => {
+                console.log(error)
+            });
         })
         .catch(error => {
-            self.setState({ validUser: (error.status === 200), sent: true, response: error.response.data});
-            console.log(error.response);
-        })
+            console.log(formData);
+            // self.setState({ validUser: (error.status === 200), sent: true, response: error.response.data});
+            console.log(error);
+        });
+
+
     }
 
 

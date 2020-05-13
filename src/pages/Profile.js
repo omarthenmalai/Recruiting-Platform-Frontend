@@ -5,6 +5,8 @@ import ApplicantApplicationCard from "../components/ApplicantApplicationCard";
 import Grid from "@material-ui/core/Grid";
 import UserInfo from "../components/UserInfo";
 import withStyles from "@material-ui/core/styles/withStyles";
+import CompanyProfile from "../components/CompanyProfile";
+import ApplicantProfile from "../components/ApplicantProfile";
 
 const url = "http://localhost:8080/"
 
@@ -42,7 +44,6 @@ class Profile extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            userId: 1,
             validUser: false,
             loading: true,
             user: null,
@@ -54,8 +55,11 @@ class Profile extends React.Component {
 
     getProfile = () => {
         const self = this;
-        fetch(url + "/users/getProfile?userId=1"
-        ).then(response => {
+        fetch(url + "api/currentuser", {
+            credentials: 'include',
+            method: 'GET',
+            mode: 'cors',
+        }).then(response => {
             this.state.validUser = (response.status === 200);
             if(response.status === 200) {
                 return response.json();
@@ -64,8 +68,8 @@ class Profile extends React.Component {
                 return response;
         })
         .then(myJson => {
-            console.log(myJson);
             if(this.state.validUser) {
+                console.log(myJson);
                 this.setState({ loading: false, user : myJson});
             }
         })
@@ -75,120 +79,39 @@ class Profile extends React.Component {
 
     }
 
-    getOpenJobs = () => {
-        var apps =
-            [
-                    {
-                        "title": "Garbageman",
-                        "location": "New York City, NY",
-                        "experienceLevel": 0,
-                        "description": "ABCDEFG",
-                        "jobStatus": "Open",
-                        "company" : "Department of Sanitation",
-                        "applicationStatus" : "Pending",
-                        "jobId" : 1
-
-                    },
-                    {
-                        "title": "Garbageman",
-                        "location": "New York City, NY",
-                        "experienceLevel": 0,
-                        "description": "ABCDEFG",
-                        "jobStatus": "Open",
-                        "company" : "Department of Sanitation",
-                        "applicationStatus" : "Pending",
-                        "jboId" : 2
-
-                    },
-                    {
-                        "title": "Garbageman",
-                        "location": "New York City, NY",
-                        "experienceLevel": 0,
-                        "description": "ABCDEFG",
-                        "jobStatus": "Open",
-                        "company" : "Department of Sanitation",
-                        "applicationStatus" : "Pending",
-                        "jobId" : 3
-
-                    },
-            ]
-            this.setState({applications: apps});
-            console.log(apps);
-            console.log(this.state);
-    }
 
     async componentDidMount() {
         await this.getProfile();
-        await this.getApplications();
-        await this.getOpenJobs();
         if(this.state.validUser) {
             console.log('test');
         }
     }
 
-    getApplications = () => {
-        // const self = this;
-        // fetch(url + "/applications/getApplicantApplications?userId=" + this.state.userId, {
-        //     method: "GET",
-        //     headers: {
-        //         'Accept': 'application/json',
-        //         'Content-Type': 'application/json',
-        //     },
-        //     }
-        // ).then(response => {
-        //     if(response.status === 200) {
-        //         return response.json();
-        //     }
-        //     else
-        //         return response;
-        // })
-        //     .then(myJson => {
-        //         console.log(myJson);
-        //         if(this.state.validUser) {
-        //             this.setState({applications: myJson});
-        //         }
-        //     })
-        //     .catch(error => {
-        //         console.error('Error: ', error);
-        //     });
-
-    }
 
     render(){
         const { classes } = this.props;
-        let curUser;
-        let apps;
-        if(!this.state.loading) {
-            if(this.state.user.accountType === "Applicant") {
-                curUser = (
-                    <UserInfo classes={classes} info={this.state.user}/>
-                );
-                console.log(this.state);
-                apps = !this.state.loading ? ((this.state.applications && this.state.applications.length) ? (
-                        this.state.applications.map(app => <ApplicantApplicationCard app={app}/>)
-                    ) : <h2>No Applications</h2>): (
-                        <p>
-                            Loading...
-                        </p>
-                );
-
-
-
-            } else {
-                curUser = (
-                    <div>
-                        company
-                    </div>
-                )
+        let profile;
+        if(this.state.user != null) {
+            if(this.state.user.accountType == 'Company') {
+                profile = (<CompanyProfile classes={classes} user={this.state.user}/>)
+            } else{
+                profile = (<ApplicantProfile classes={classes} user={this.state.user}/>)
             }
+        } else {
+            profile = (
+                <div>Loading...</div>
+            )
         }
+        // var profile = (!this.state.loading) ?
+        //     ((<CompanyProfile classes={classes} user={this.state.user}/>)
+        //     ) : (
+        //         <div>Loading...</div>
+        //     )
+        var apps = this.state.apps
         return(
                 <Grid container direction = "row" className={classes.root} justify={'center'} alignItems={'center'}>
                     <Grid item xs={4}>
-                        {curUser}
-                    </Grid>
-                    <Grid item xs={8} className>
-                        {apps}
+                        {profile}
                     </Grid>
                 </Grid>
 

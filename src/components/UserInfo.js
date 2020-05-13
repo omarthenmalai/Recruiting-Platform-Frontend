@@ -9,8 +9,7 @@ class UserInfo extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            fistName: "",
-            lastName: "",
+            username: "",
             email: "",
         }
         this.setDefaults = this.setDefaults.bind(this);
@@ -25,8 +24,8 @@ class UserInfo extends React.Component {
     };
 
     setDefaults = () => {
-        const {info :{firstName, lastName, email, accountType}} = this.props;
-        this.setState({firstName: firstName, lastName: lastName, email: email})
+        const {info :{ username, email, accountType}} = this.props;
+        this.setState({ username: username, email: email})
     }
 
     componentDidMount() {
@@ -36,7 +35,7 @@ class UserInfo extends React.Component {
 
 
     render() {
-        const { classes, info: {firstName, lastName, email, accountType}} = this.props;
+        const { classes, info: {username, email, accountType}} = this.props;
         return(
             <Grid container>
                 <Grid item xs={6}>
@@ -52,18 +51,7 @@ class UserInfo extends React.Component {
                                 label="First Name"
                                 name={'firstName'}
                                 onChange={this.handleChange}
-                                value={this.state.firstName}
-                                variant={'outlined'}
-                                className={classes.textfield}
-                            />
-                        </Grid>
-                        <Grid item xs={2}>
-                            <TextField
-                                id="standard-basic"
-                                label="Last Name"
-                                name={'lastName'}
-                                onChange={this.handleChange}
-                                value={this.state.lastName}
+                                value={this.state.username}
                                 variant={'outlined'}
                                 className={classes.textfield}
                             />
@@ -83,11 +71,6 @@ class UserInfo extends React.Component {
                             <h3 className={classes.textfield}>
                                 {accountType}
                             </h3>
-                        </Grid>
-                        <Grid item xs={2}>
-                            <Button className={classes.button} onClick={this.handleSubmit} variant={'outlined'} color={'primary'}>
-                                Save Changes
-                            </Button>
                         </Grid>
                     </Grid>
                 </Grid>
