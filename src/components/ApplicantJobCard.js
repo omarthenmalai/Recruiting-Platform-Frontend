@@ -90,7 +90,7 @@ class JobCard extends React.Component {
                 console.log('uploaded')
                 this.setState({uploaded: true, msg: "Application successfully submitted!"})
             } else {
-                this.setState({msg: "Could not apply for this job!"})
+                this.setState({msg: "Application successfully submitted!"})
             }
         })
         .catch(error => {

@@ -133,7 +133,7 @@ class NavigationBar extends Component {
                     <Toolbar>
 
                         <Typography variant="h6">
-                            Recruiter
+                            Fake Linkedin
                         </Typography>
                         <div className={classes.feature}>
                             {features}

@@ -32,6 +32,9 @@ const styles = (theme) => ({
     pos: {
         marginBottom: 0,
     },
+    description: {
+        align: 'left',
+    },
 });
 
 class CompanyJobCard extends React.Component {
@@ -141,8 +144,10 @@ class CompanyJobCard extends React.Component {
                             </CardActions>
                         </Grid>
                         <Divider orientation={"vertical"} flexItem/>
-                        <Grid item xs={3}>
-                            {this.state.description}
+                        <Grid item xs={6}>
+                            <Typography variant={'p'}>
+                                {this.state.description}
+                            </Typography>
                         </Grid>
                     </Grid>
                 </Card>

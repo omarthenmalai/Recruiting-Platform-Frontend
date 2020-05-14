@@ -7,6 +7,7 @@ import TextField from "@material-ui/core/TextField";
 import MenuItem from "@material-ui/core/MenuItem";
 import InputLabel from "@material-ui/core/InputLabel";
 import ApplicantJobCard from "../components/ApplicantJobCard";
+import Typography from "@material-ui/core/Typography";
 
 const url = "http://localhost:8080"
 
@@ -135,11 +136,22 @@ class SearchJobs extends React.Component {
 
     render() {
         const { classes } = this.props;
-        let jobs = !this.state.loading ? ((this.state.data && this.state.data.length) ? (
-            this.state.data.map(job => <ApplicantJobCard classes={classes} info={job} user={this.state.user}/>)
-        ) : <h2>No Matches Found That Meet Your Criteria</h2>) : (
-            <p>Loading...</p>
-        );
+        let jobs;
+        if(!this.state.loading && this.state.user.accountType === "Company") {
+            jobs = (
+                <div>
+                    <Typography variant="h2">
+                        This feature is only available for applicants.
+                    </Typography>
+                </div>
+            )
+        } else {
+            jobs = !this.state.loading ? ((this.state.data && this.state.data.length) ? (
+                this.state.data.map(job => <ApplicantJobCard classes={classes} info={job} user={this.state.user}/>)
+            ) : <h2>No Matches Found That Meet Your Criteria</h2>) : (
+                <p>Loading...</p>
+            );
+        }
 
 
         return (

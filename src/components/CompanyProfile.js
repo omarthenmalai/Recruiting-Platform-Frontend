@@ -6,6 +6,7 @@ import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
 import JobCard from "./CompanyJobCard";
 import CompanyApplicationCard from "./CompanyApplicationCard";
+import Typography from "@material-ui/core/Typography";
 
 const styles = (theme) => ({
     root: {
@@ -101,14 +102,47 @@ class CompanyProfile extends React.Component {
             div = (<UserInfo classes={styles} info={user}/>);
         }
         else if(this.state.showApps) {
-            div = (
-                this.state.jobs.map(job => <CompanyApplicationCard classes={styles} job={job} user={user}/>)
-            );
+            if(this.state.jobs === null || this.state.jobs.length === 0) {
+                div = (
+                    <div>
+                        <Typography variant="h2">
+                            No Jobs Posted
+                        </Typography>
+                        <Typography variant="h6">
+                            so obviously no applications
+                        </Typography>
+                        <Typography variant={"p"}>
+                            <a href={"http://localhost:3000/post-job"}>
+                                Post a job
+                            </a>
+                        </Typography>
+                    </div>
+                )
+            } else {
+                div = (
+                    this.state.jobs.map(job => <CompanyApplicationCard classes={styles} job={job} user={user}/>)
+                );
+            }
         }
         else if(this.state.showJobs) {
-            div = (
-                this.state.jobs.map(job => <JobCard classes={styles} info={job} type={"company"} user={user}/>)
-            )
+            if(this.state.jobs.length === 0) {
+                div = (
+                    <div>
+                        <Typography variant="h2">
+                            No Jobs Posted
+                        </Typography>
+                        <Typography variant={"p"}>
+                            <a href={"http://localhost:3000/post-job"}>
+                                Post a job
+                            </a>
+                        </Typography>
+                    </div>
+                )
+            } else {
+                div = (
+                    this.state.jobs.map(job => <JobCard classes={styles} info={job} type={"company"} user={user}/>)
+                )
+            }
         }
 
         return(

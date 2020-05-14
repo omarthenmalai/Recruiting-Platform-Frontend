@@ -120,6 +120,7 @@ class LogIn extends React.Component {
                         label="Password"
                         onChange={this.handleChange}
                         name={'password'}
+                        type={'password'}
                         variant={"outlined"}
                         value={this.state.password}
                         className={classes.textfield}

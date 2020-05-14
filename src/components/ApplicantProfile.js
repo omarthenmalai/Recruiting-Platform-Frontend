@@ -6,6 +6,7 @@ import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
 import JobCard from "./CompanyJobCard";
 import CompanyProfile from "./CompanyProfile";
+import Typography from "@material-ui/core/Typography";
 
 
 class ApplicantProfile extends React.Component {
@@ -52,9 +53,22 @@ class ApplicantProfile extends React.Component {
             div = (<UserInfo classes={classes} info={user}/>);
         }
         else if(this.state.showApps) {
-            div = (
-                this.state.applications.map(app => <ApplicantApplicationCard classes={classes} user={user} app={app}/>)
-            );
+            if(this.state.applications === null || this.state.applications.length === 0) {
+                div = (
+                    <div>
+                    <Typography variant="h2">
+                        No Applications
+                    </Typography>
+                    <Typography variant={"p"}>
+                        <a href={"http://localhost:3000/jobs"}>
+                            Search for a job and apply
+                        </a>
+                    </Typography>
+                </div>
+                )
+            } else {
+                div = (this.state.applications.map(app => <ApplicantApplicationCard classes={classes} user={user} app={app}/>));
+            }
         }
         else {
             div = (<div>Loading...</div>);
